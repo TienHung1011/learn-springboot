@@ -3,8 +3,11 @@ package com.example.learn_springboot.controller;
 
 import com.example.learn_springboot.dto.request.UserCreateRequest;
 import com.example.learn_springboot.dto.request.UserUpdateRequest;
+import com.example.learn_springboot.dto.response.ApiResponse;
+import com.example.learn_springboot.dto.response.UserResponse;
 import com.example.learn_springboot.entity.User;
 import com.example.learn_springboot.services.UserService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 
 import lombok.RequiredArgsConstructor;
@@ -23,18 +26,28 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody UserCreateRequest request){
-        return userService.createUser(request);
+    public ApiResponse<User> createUser(@RequestBody @Valid UserCreateRequest request){
+        return ApiResponse.<User>builder()
+                .code(200)
+                .message("Successfully created user")
+                .result(userService.createUser(request))
+                .build();
     }
 
     @GetMapping
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
+    public ApiResponse<List<UserResponse>> getAllUsers(){
+       return ApiResponse.<List<UserResponse>>builder()
+               .code(200)
+               .result(userService.getAllUsers())
+               .build();
     }
 
     @GetMapping("/{id}")
-    public User findUserById(@PathVariable String id){
-        return userService.getUserById(id);
+    public ApiResponse<UserResponse> findUserById(@PathVariable String id){
+        return ApiResponse.<UserResponse>builder()
+                .code(200)
+                .result(userService.getUserById(id))
+                .build();
     }
 
     @PutMapping("/{id}")
