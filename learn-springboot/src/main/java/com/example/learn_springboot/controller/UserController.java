@@ -26,8 +26,8 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    public ApiResponse<User> createUser(@RequestBody @Valid UserCreateRequest request){
-        return ApiResponse.<User>builder()
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreateRequest request){
+        return ApiResponse.<UserResponse>builder()
                 .code(200)
                 .message("Successfully created user")
                 .result(userService.createUser(request))
@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public UserResponse updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
         return userService.updateUser(request, id);
     }
 
