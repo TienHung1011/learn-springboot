@@ -11,6 +11,8 @@ import com.example.learn_springboot.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,10 +32,12 @@ public class UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
     }
-    public User createUser(UserCreateRequest request) {
+    public UserResponse createUser(UserCreateRequest request) {
         validateUser(request.getUsername());
         User newUser = userMapper.toUser(request);
-        return userRepository.save(newUser);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10); // Độ mạnh của mã hóa
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userMapper.toUserResponse(userRepository.save(newUser));
     }
 
     public List<UserResponse> getAllUsers(){
@@ -48,7 +52,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
     }
 
-    public User updateUser(UserUpdateRequest request, String id){
+    public UserResponse updateUser(UserUpdateRequest request, String id){
         User updateUser = userRepository.findById(id)
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         validateUser(request.getUsername());
@@ -64,7 +68,7 @@ public class UserService {
         if(request.getLastName()!= null){
             updateUser.setLastName(request.getLastName());
         }
-        return userRepository.save(updateUser);
+        return userMapper.toUserResponse(userRepository.save(updateUser));
     }
 
     public void deleteUser(String id){
